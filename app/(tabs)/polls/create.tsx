@@ -34,9 +34,14 @@ export default function CreatePoll() {
     }
 
     try{
+      //Initialize votes with 0 for each option
+      const votesInit = options.reduce((acc, option) => ({ ...acc, [option]: 0 }), {});
+
       await addDoc(collection(db, "polls"), {
         question,
         options,
+        votes: votesInit,
+        voters: {},
         createdAt: serverTimestamp(),
       });
 

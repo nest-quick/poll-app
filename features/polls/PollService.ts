@@ -1,39 +1,30 @@
-import { collection, getDocs, doc, updateDoc, increment } from "firebase/firestore";
-import { db } from "@/lib/firebaseConfig"; // Ensure the path is correct
+import { collection, getDocs, doc, updateDoc, arrayUnion, increment } from "firebase/firestore";
+import { db, auth } from "@/lib/firebaseConfig";
 
-// Define the structure of a poll
-export interface Poll {
-  id: string;
-  question: string;
-  options: string[];
-  votes: Record<string, number>; // Map structure for votes
-}
+//Fetch Polls
+export const fetchPolls = async () => {
+  const querySnapshot = await getDocs(collection(db, "polls"));
+  return querySnapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}));
+};
 
-// Fetch polls from Firestore
-export async function getPolls(): Promise<Poll[]> {
-    try {
-      const querySnapshot = await getDocs(collection(db, "polls"));
-      const polls: Poll[] = querySnapshot.docs.map((doc) => {
-        const data = doc.data() as Omit<Poll, "id">; // Exclude 'id' from the spread
-        return { id: doc.id, ...data }; // Now id is assigned only once
-      });
-      return polls;
-    } catch (error) {
-      console.error("Error fetching polls:", error);
-      return [];
-    }
-  }  
+//Vote on Poll
+export const voteOnPoll = async (pollId: string, userId: string, option: string) => {
+  if (!auth.currentUser || !userId) {
+    console.error("Error: Invalid user ID");
+    return;
+  }
 
-// Handle voting
-export async function voteOnPoll(pollId: string, optionIndex: number) {
+  const pollRef = doc(db, "polls", pollId);
+
   try {
-    const pollRef = doc(db, "polls", pollId);
-
-    // Increment the vote count in Firestore
+    console.log(`Voting on poll: ${pollId}, userId: ${userId}, option: ${option}`);
+    
     await updateDoc(pollRef, {
-      [`votes.${optionIndex}`]: increment(1),
+      [`votes.${option}`]: increment(1), // Increment vote count for the option
+      [`voters.${userId}`]: option, // Store the user's vote
     });
   } catch (error) {
-    console.error("Error voting on poll:", error);
+    console.error("Error voting1:", error);
+    throw new Error("Failed to submit vote");
   }
-}
+};

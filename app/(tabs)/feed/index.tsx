@@ -1,56 +1,54 @@
-import { useEffect, useState } from "react";
-import {
-  View,
-  FlatList,
-  StyleSheet,
-  ActivityIndicator,
-  RefreshControl,
-} from "react-native";
+import { useState, useEffect } from "react";
+import { View, FlatList, ActivityIndicator, RefreshControl } from "react-native";
 import PollCard from "@/components/PollCard";
-import { getPolls, Poll } from "@/features/polls/PollService";
+import { fetchPolls } from "@/features/polls/PollService";
 
-export default function FeedScreen() {
-  const [polls, setPolls] = useState<Poll[]>([]);
+export default function Feed() {
+  const [polls, setPolls] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+  const [refreshing, setRefreshing] = useState(false); // Refreshing state
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
-  const fetchPolls = async () => {
-    const fetchedPolls = await getPolls();
-    setPolls(fetchedPolls);
+  const loadPolls = async () => {
+    setLoading(true);
+    const data = await fetchPolls();
+    setPolls(data);
     setLoading(false);
-    setRefreshing(false); // Stop refresh animation after data loads
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadPolls();
+    setRefreshing(false);
   };
 
   useEffect(() => {
-    fetchPolls();
+    loadPolls();
   }, []);
 
-  const handleRefresh = () => {
-    setRefreshing(true);
-    fetchPolls();
-  };
-
   if (loading) {
-    return <ActivityIndicator size="large" style={styles.loading} />;
+    return <ActivityIndicator size="large" />;
   }
 
   return (
-    <View style={styles.container}>
+    <View>
       <FlatList
         data={polls}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <PollCard {...item} />}
-        contentContainerStyle={styles.list}
+        renderItem={({ item }) => (
+          <PollCard 
+            id={item.id} 
+            question={item.question} 
+            options={item.options} 
+            votes={item.votes} 
+            voters={item.voters} 
+          />
+        )}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       />
     </View>
   );
+  
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
-  list: { paddingHorizontal: 10 },
-  loading: { flex: 1, justifyContent: "center", alignItems: "center" },
-});

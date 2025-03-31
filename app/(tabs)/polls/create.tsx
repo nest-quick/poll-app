@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Alert, FlatList } from "react-native";
-import {db, auth} from '../../lib/firebaseConfig';
+import {db, auth} from '../../../lib/firebaseConfig';
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from "expo-router";
 
@@ -82,7 +82,7 @@ export default function CreatePoll() {
         )}
       />
 
-      <Button title="App Option" onPress={addOption}/>
+      <Button title="Add Option" onPress={addOption}/>
       <Button title="Create Poll" onPress={submitPoll}/>
     </View>
   );

@@ -1,10 +1,12 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { auth } from "../../lib/firebaseConfig";
-import { User, onAuthStateChanged, signOut } from "firebase/auth";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { User, onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "expo-router";
+import { loginUser, logoutUser } from "@/features/auth/AuthService"; // Import the service
+import { auth } from "../../lib/firebaseConfig";
 
 interface AuthContextProps {
   user: User | null;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -23,11 +25,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => unsubscribe();
   }, []);
 
-  const logout = async () => {
-    await signOut(auth);
+  const login = async (email: string, password: string) => {
+    const loggedUser = await loginUser(email, password);
+    setUser(loggedUser);
+    if (loggedUser) router.replace("/feed");
   };
 
-  return <AuthContext.Provider value={{ user, logout }}>{children}</AuthContext.Provider>;
+  const logout = async () => {
+    await logoutUser();
+    setUser(null);
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => {
@@ -35,3 +48,4 @@ export const useAuth = () => {
   if (!context) throw new Error("useAuth must be used within an AuthProvider");
   return context;
 };
+

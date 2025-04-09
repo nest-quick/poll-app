@@ -6,12 +6,12 @@ import { auth } from "@/lib/firebaseConfig";
 export interface PollCardProps {
   id: string;
   question: string;
-  options: string[];
+  options?: string[];
   votes?: Record<string, number>;
   voters?: {[userId: string]: string};
 }
 
-export default function PollCard({ id, question, options, votes = {}, voters ={}}: PollCardProps) {
+export default function PollCard({ id, question, options = [], votes = {}, voters ={}}: PollCardProps) {
   const [localVotes, setLocalVotes] = useState(votes);
   const [votedOption, setVotedOption] = useState<string | null>(null);
   const hasVoted = Boolean(votedOption);

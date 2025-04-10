@@ -3,8 +3,10 @@ import { View, TextInput, Button, Text, StyleSheet, TouchableOpacity } from "rea
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../lib/firebaseConfig";
 import { useRouter } from "expo-router";
+import { registerUser, saveUserToFirestore } from "@/features/auth/AuthService";
 
 export default function Register() {
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -16,10 +18,20 @@ export default function Register() {
       setError("Passwords do not match");
       return;
     }
-
+  
+    if (!username.trim()) {
+      setError("Username is required");
+      return;
+    }
+  
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      router.replace("/(tabs)/feed");
+      const user = await registerUser(email, password);
+      if (user) {
+        await saveUserToFirestore(user.uid, username, email);
+        router.replace("/(tabs)/feed");
+      } else {
+        setError("Registration failed.");
+      }
     } catch (err) {
       setError("Failed to register. Please try again.");
     }
@@ -28,7 +40,14 @@ export default function Register() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Register</Text>
-      
+
+      <TextInput
+        style={styles.input}
+        placeholder="Username"
+        value={username}
+        onChangeText={setUsername}
+      />
+
       <TextInput
         style={styles.input}
         placeholder="Email"

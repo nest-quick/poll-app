@@ -1,19 +1,70 @@
 import { useAuth } from "@/features/auth/AuthContext";
-import { View, Text, Button, StyleSheet } from "react-native";
+import { db } from "@/lib/firebaseConfig";
+import { doc, getDoc } from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { View, Text, Button, StyleSheet, Image, ActivityIndicator } from "react-native";
 
 export default function Profile() {
   const { user, logout } = useAuth();
+  const [profileData, setProfileData] = useState<{username: string; bio: string; profilePicture: string;} | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProfileData = async() => {
+      if(user) {
+        try{
+          const docRef = doc(db, "users", user.uid);
+          const docSnap = await getDoc(docRef);
+
+          if(docSnap.exists()) {
+            const data = docSnap.data();
+            setProfileData({
+              username: data.username || "",
+              bio: data.bio || "",
+              profilePicture: data.profilePicture || "",
+            });
+          }
+          else{
+            console.warn("No user profile data found.");
+          }
+        } catch(error) {
+          console.error("Error fetching user profile: ", error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchProfileData();
+  }, [user]);
+
+  if(!user) {
+    return (
+      <View>
+        <Text>Please log in to view your profile.</Text>
+      </View>
+    );
+  }
+
+  if(loading){
+    return(
+      <View style={styles.container}>
+        <ActivityIndicator/>
+      </View>
+    );
+  }
+
 
   return (
     <View style={styles.container}>
-      {user ? (
-        <>
-          <Text style={styles.welcomeText}>Welcome, {user.email}</Text>
-          <Button title="Sign Out" onPress={logout} />
-        </>
+      {profileData?.profilePicture ? (
+          <Image source={{uri: profileData.profilePicture}} style={styles.profileImage}/>
       ) : (
-        <Text>Please log in to view your profile.</Text>
+        <View style={styles.placeholderImage}/>
       )}
+      <Text style={styles.username}>@{profileData?.username}</Text>
+      <Text style={styles.bio}>{profileData?.bio || "No bio added yet."}</Text>
+      <Button title="Sign Out" onPress={logout} />
     </View>
   );
 }
@@ -21,12 +72,35 @@ export default function Profile() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     padding: 20,
   },
-  welcomeText: {
-    fontSize: 20,
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 20,
+  },
+  placeholderImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: "#ccc",
+    marginBottom: 20,
+  },
+  username: {
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  email: {
+    fontSize: 16,
+    color: "#888",
+    marginBottom: 10,
+  },
+  bio: {
+    fontSize: 16,
+    textAlign: "center",
     marginBottom: 20,
   },
 });

@@ -1,7 +1,8 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { useEffect, useState } from "react";
 import { voteOnPoll } from "@/features/polls/PollService";
-import { auth } from "@/lib/firebaseConfig";
+import { auth, db  } from "@/lib/firebaseConfig";
+import { doc, getDoc } from "firebase/firestore";
 
 export interface PollCardProps {
   id: string;
@@ -9,13 +10,16 @@ export interface PollCardProps {
   options?: string[];
   votes?: Record<string, number>;
   voters?: {[userId: string]: string};
+  creatorId: string;
 }
 
-export default function PollCard({ id, question, options = [], votes = {}, voters ={}}: PollCardProps) {
+export default function PollCard({ id, question, options = [], votes = {}, voters ={}, creatorId}: PollCardProps) {
   const [localVotes, setLocalVotes] = useState(votes);
   const [votedOption, setVotedOption] = useState<string | null>(null);
   const hasVoted = Boolean(votedOption);
   const [userId, setUserId] = useState<string | null>(null);
+  const [creatorUsername, setCreatorUsername] = useState<string>("");
+  const [creatorProfilePicture, setCreatorProfilePicture] = useState<string | null>(null);
 
   useEffect(() => {
     if (auth.currentUser) {
@@ -30,6 +34,26 @@ export default function PollCard({ id, question, options = [], votes = {}, voter
       setVotedOption(voters[userId] || null);
     }
   }, [voters, userId]);
+
+  useEffect(() => {
+    const fetchCreatorInfo = async() => {
+      if (!creatorId) return;
+
+      try{
+        const docRef = doc(db, "users", creatorId);
+        const docSnap = await getDoc(docRef);
+        if(docSnap.exists()){
+          const data = docSnap.data();
+          setCreatorUsername(data.username || "Unknown");
+          setCreatorProfilePicture(data.profilePicture || null);
+        }
+      }catch(error) {
+        console.error("Error fetching creator info: ", error);
+      }
+    };
+
+    fetchCreatorInfo();
+  }, [creatorId]);
 
   const handleVote = async (option: string) => {
     console.log("Attempting to vote with userId:", userId);
@@ -52,6 +76,14 @@ export default function PollCard({ id, question, options = [], votes = {}, voter
 
   return (
     <View style={styles.card}>
+      <View style={styles.creatorRow}>
+        {creatorProfilePicture ? (
+          <Image source={{ uri: creatorProfilePicture }} style={styles.avatar} />
+        ) : (
+          <View style={styles.avatarPlaceholder} />
+        )}
+        <Text style={styles.username}>@{creatorUsername}</Text>
+      </View>
       <Text style={styles.question}>{question}</Text>
       {options.map((option, index) => (
         <TouchableOpacity
@@ -104,4 +136,27 @@ const styles = StyleSheet.create({
   votedButton: {
     backgroundColor: "red", // Highlight the voted option
   },
+  creatorRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 8,
+  },
+  avatarPlaceholder: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#ccc",
+    marginRight: 8,
+  },
+  username: {
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  
 });

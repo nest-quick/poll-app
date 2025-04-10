@@ -41,7 +41,8 @@ export default function Feed() {
             question={item.question} 
             options={item.options} 
             votes={item.votes} 
-            voters={item.voters} 
+            voters={item.voters}
+            creatorId={item.creatorId} 
           />
         )}
         refreshControl={

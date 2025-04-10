@@ -34,6 +34,12 @@ export default function CreatePoll() {
     }
 
     try{
+      const user = auth.currentUser;
+      if(!user) {
+        Alert.alert("Error", "You must be logged in to create a poll");
+        return;
+      }
+
       //Initialize votes with 0 for each option
       const votesInit = options.reduce((acc, option) => ({ ...acc, [option]: 0 }), {});
 
@@ -43,6 +49,7 @@ export default function CreatePoll() {
         votes: votesInit,
         voters: {},
         createdAt: serverTimestamp(),
+        creatorId: user.uid,
       });
 
       Alert.alert("Success", "Poll created!");

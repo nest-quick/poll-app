@@ -1,6 +1,6 @@
 import { useAuth } from "@/features/auth/AuthContext";
 import { db } from "@/lib/firebaseConfig";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { useEffect, useState, useCallback } from "react";
 import { View, Text, Button, StyleSheet, Image, ActivityIndicator } from "react-native";
 import { useFocusEffect } from "@react-navigation/native"
@@ -9,6 +9,7 @@ export default function Profile() {
   const { user, logout } = useAuth();
   const [profileData, setProfileData] = useState<{username: string; bio: string; profilePicture: string;} | null>(null);
   const [loading, setLoading] = useState(true);
+  const[userPolls, setUserPolls] = useState<any[]>([]);
 
   const fetchProfileData = async() => {
     if(user) {
@@ -27,6 +28,17 @@ export default function Profile() {
         else{
           console.warn("No user profile data found.");
         }
+
+        //Fetch Polls created by User
+        const q = query(collection(db, "polls"), where ("creatorId", "==", user.uid));
+        const querySnapshot = await getDocs(q);
+        const polls: any[] = [];
+
+        querySnapshot.forEach((doc) => {
+          polls.push({id: doc.id, ...doc.data()});
+        });
+
+        setUserPolls(polls);
       } catch(error) {
         console.error("Error fetching user profile: ", error);
       } finally {
@@ -34,6 +46,7 @@ export default function Profile() {
       }
     }
   };
+
   useFocusEffect(
     useCallback(() => {
       setLoading(true);
@@ -68,7 +81,27 @@ export default function Profile() {
       <Text style={styles.username}>@{profileData?.username}</Text>
       <Text style={styles.bio}>{profileData?.bio || "No bio added yet."}</Text>
       <Button title="Sign Out" onPress={logout} />
+      <View style={styles.pollSection}>
+        <Text style={styles.sectionTitle}>Your Polls</Text>
+        {userPolls.length === 0 ? (
+          <Text>No polls created yet.</Text>
+        ) : (
+          userPolls.map((poll) => (
+            <View key={poll.id} style={styles.pollCard}>
+              <Text style={styles.pollQuestion}>{poll.question}</Text>
+              {/* Optionally show votes */}
+              {poll.options?.map((opt: string) => (
+                <Text key={opt}>
+                  {opt} - {poll.votes?.[opt] || 0} votes
+                </Text>
+              ))}
+            </View>
+          ))
+        )}
+      </View>
+
     </View>
+    
   );
 }
 
@@ -106,4 +139,23 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
   },
+  pollSection: {
+    marginTop: 20,
+    width: "100%",
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  pollCard: {
+    backgroundColor: "#f2f2f2",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  pollQuestion: {
+    fontWeight: "600",
+    marginBottom: 5,
+  },  
 });

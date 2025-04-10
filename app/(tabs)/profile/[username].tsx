@@ -1,42 +1,45 @@
 import { useAuth } from "@/features/auth/AuthContext";
 import { db } from "@/lib/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { View, Text, Button, StyleSheet, Image, ActivityIndicator } from "react-native";
+import { useFocusEffect } from "@react-navigation/native"
 
 export default function Profile() {
   const { user, logout } = useAuth();
   const [profileData, setProfileData] = useState<{username: string; bio: string; profilePicture: string;} | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchProfileData = async() => {
-      if(user) {
-        try{
-          const docRef = doc(db, "users", user.uid);
-          const docSnap = await getDoc(docRef);
+  const fetchProfileData = async() => {
+    if(user) {
+      try{
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
 
-          if(docSnap.exists()) {
-            const data = docSnap.data();
-            setProfileData({
-              username: data.username || "",
-              bio: data.bio || "",
-              profilePicture: data.profilePicture || "",
-            });
-          }
-          else{
-            console.warn("No user profile data found.");
-          }
-        } catch(error) {
-          console.error("Error fetching user profile: ", error);
-        } finally {
-          setLoading(false);
+        if(docSnap.exists()) {
+          const data = docSnap.data();
+          setProfileData({
+            username: data.username || "",
+            bio: data.bio || "",
+            profilePicture: data.profilePicture || "",
+          });
         }
+        else{
+          console.warn("No user profile data found.");
+        }
+      } catch(error) {
+        console.error("Error fetching user profile: ", error);
+      } finally {
+        setLoading(false);
       }
-    };
-
-    fetchProfileData();
-  }, [user]);
+    }
+  };
+  useFocusEffect(
+    useCallback(() => {
+      setLoading(true);
+      fetchProfileData();
+    }, [user])
+  );
 
   if(!user) {
     return (

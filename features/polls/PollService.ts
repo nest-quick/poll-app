@@ -1,4 +1,4 @@
-import { collection, getDocs, doc, updateDoc, arrayUnion, increment } from "firebase/firestore";
+import { collection, getDocs, doc, updateDoc, increment, addDoc, orderBy, query, serverTimestamp } from "firebase/firestore";
 import { db, auth } from "@/lib/firebaseConfig";
 
 //Fetch Polls
@@ -27,4 +27,23 @@ export const voteOnPoll = async (pollId: string, userId: string, option: string)
     console.error("Error voting1:", error);
     throw new Error("Failed to submit vote");
   }
+};
+
+//Add Comment to Poll
+export const addCommentToPoll = async(pollId: string, userId:string, text: string) => {
+  const commentRef = collection(db, "polls", pollId, "comments");
+  await( addDoc(commentRef, {
+    text, 
+    userId, 
+    createdAt: serverTimestamp(),
+  }));
+};
+
+//See Comment from Poll
+export const getCommmentForPoll = async(pollId: string) => {
+  const commentsRef = collection(db, "polls", pollId, "comments");
+  const q = query(commentsRef, orderBy("createdAt", "asc"));
+  const snapshot = await getDocs(q);
+
+  return snapshot.docs.map(doc => ({id: doc.id, ...doc.data() }));
 };

@@ -4,46 +4,51 @@ import { doc, getDoc, collection, query, where, getDocs } from "firebase/firesto
 import { useEffect, useState, useCallback } from "react";
 import { View, Text, Button, StyleSheet, Image, ActivityIndicator } from "react-native";
 import { useFocusEffect } from "@react-navigation/native"
+import { useLocalSearchParams } from "expo-router";
 
 export default function Profile() {
   const { user, logout } = useAuth();
-  const [profileData, setProfileData] = useState<{username: string; bio: string; profilePicture: string;} | null>(null);
+  const { username } = useLocalSearchParams();
+  const [profileData, setProfileData] = useState<{username: string; bio: string; profilePicture: string; uid: string;} | null>(null);
   const [loading, setLoading] = useState(true);
   const[userPolls, setUserPolls] = useState<any[]>([]);
 
   const fetchProfileData = async() => {
-    if(user) {
-      try{
-        const docRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(docRef);
+    if(!username) return;
 
-        if(docSnap.exists()) {
-          const data = docSnap.data();
-          setProfileData({
-            username: data.username || "",
-            bio: data.bio || "",
-            profilePicture: data.profilePicture || "",
-          });
-        }
-        else{
-          console.warn("No user profile data found.");
-        }
+    try{
+      const q = query(collection(db, "users"), where ("username", "==", username));
+      const querySnapshot = await getDocs(q);
 
-        //Fetch Polls created by User
-        const q = query(collection(db, "polls"), where ("creatorId", "==", user.uid));
-        const querySnapshot = await getDocs(q);
-        const polls: any[] = [];
-
-        querySnapshot.forEach((doc) => {
-          polls.push({id: doc.id, ...doc.data()});
-        });
-
-        setUserPolls(polls);
-      } catch(error) {
-        console.error("Error fetching user profile: ", error);
-      } finally {
-        setLoading(false);
+      if(querySnapshot.empty){
+        console.warn("No user profile data found");
+        setProfileData(null);
+        return;
       }
+
+      const docSnap = querySnapshot.docs[0];
+      const data = docSnap.data();
+
+      setProfileData({
+        username: data.username || "",
+        bio: data.bio || "",
+        profilePicture: data.profilePicture || "",
+        uid: docSnap.id,
+      });
+
+      const pollsQuery = query(collection(db, "polls"), where("creatorId", "==", docSnap.id));
+      const pollSnapshot = await getDocs(pollsQuery);
+      const polls: any[] = [];
+
+      pollSnapshot.forEach((pollDoc) => {
+        polls.push({id: pollDoc.id, ...pollDoc.data()});
+      });
+
+      setUserPolls(polls);
+    }catch(error) {
+      console.error("Error fetching user profile: ", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -51,16 +56,8 @@ export default function Profile() {
     useCallback(() => {
       setLoading(true);
       fetchProfileData();
-    }, [user])
+    }, [username])
   );
-
-  if(!user) {
-    return (
-      <View>
-        <Text>Please log in to view your profile.</Text>
-      </View>
-    );
-  }
 
   if(loading){
     return(
@@ -70,6 +67,13 @@ export default function Profile() {
     );
   }
 
+  if (!profileData) {
+    return (
+      <View style={styles.container}>
+        <Text>User not found.</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -80,7 +84,9 @@ export default function Profile() {
       )}
       <Text style={styles.username}>@{profileData?.username}</Text>
       <Text style={styles.bio}>{profileData?.bio || "No bio added yet."}</Text>
-      <Button title="Sign Out" onPress={logout} />
+      {user?.uid === profileData.uid && (
+        <Button title="Sign Out" onPress={logout} />
+      )}
       <View style={styles.pollSection}>
         <Text style={styles.sectionTitle}>Your Polls</Text>
         {userPolls.length === 0 ? (

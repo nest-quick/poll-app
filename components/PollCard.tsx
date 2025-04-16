@@ -23,6 +23,7 @@ export default function PollCard({ id, question, options = [], votes = {}, voter
   const [creatorProfilePicture, setCreatorProfilePicture] = useState<string | null>(null);
   const [commentInput, setCommentInput] = useState("");
   const [comments, setComments] = useState<any[]>([]);
+  const [showComments, setShowComments] = useState(false);
 
   useEffect(() => {
     if (auth.currentUser) {
@@ -150,39 +151,49 @@ export default function PollCard({ id, question, options = [], votes = {}, voter
         disabled={hasVoted}
       >
         <Text style={styles.optionText}>
-          {option} - {localVotes[option] || 0} votes
+          {option} - Votes {localVotes[option] || 0}
         </Text>
       </TouchableOpacity>
       ))}
       <View style={styles.commentSection}>
-        <Text style={styles.sectionTitle}>Comments</Text>
-        {comments.length === 0 ? (
-          <Text style={styles.commentText}>No comments yet.</Text>
-        ): (
-          comments.map((comment) => (
-            <View key={comment.id} style={styles.commentRow}>
-              {comment.profilePicture ? (
-                <Image source={{ uri: comment.profilePicture }} style={styles.commentAvatar} />
-              ) : (
-                <View style={styles.commentAvatarPlaceholder} />
-              )}
-              <View>
-                <Text style={styles.commentUsername}>@{comment.username}</Text>
-                <Text style={styles.commentText}>{comment.text}</Text>
-              </View>
-            </View>
-          ))
-        )}
-
-        <TextInput
-          value={commentInput}
-          onChangeText={setCommentInput}
-          placeholder="Write a comment...."
-          style={styles.input}
-        />
-        <TouchableOpacity onPress={handleAddComment} style={styles.commentButton}>
-          <Text style={styles.commentButtonText}>Post</Text>
+        <TouchableOpacity
+          onPress={() => setShowComments((prev) => !prev)}
+        >
+          <Text style={styles.sectionTitle}>
+            Comments {showComments ? "▲" : "▼"}
+          </Text>
         </TouchableOpacity>
+        {showComments && (
+          <>
+            {comments.length === 0 ? (
+              <Text style={styles.commentText}>No comments yet.</Text>
+            ): (
+              comments.map((comment) => (
+                <View key={comment.id} style={styles.commentRow}>
+                  {comment.profilePicture ? (
+                    <Image source={{ uri: comment.profilePicture }} style={styles.commentAvatar} />
+                  ) : (
+                    <View style={styles.commentAvatarPlaceholder} />
+                  )}
+                  <View>
+                    <Text style={styles.commentUsername}>@{comment.username}</Text>
+                    <Text style={styles.commentText}>{comment.text}</Text>
+                  </View>
+                </View>
+              ))
+            )}
+
+            <TextInput
+              value={commentInput}
+              onChangeText={setCommentInput}
+              placeholder="Write a comment...."
+              style={styles.input}
+            />
+            <TouchableOpacity onPress={handleAddComment} style={styles.commentButton}>
+              <Text style={styles.commentButtonText}>Post</Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
 
     </View>
@@ -208,6 +219,7 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 16,
     marginLeft: 10,
+    color: "white",
   },
   disabledButton: {
     backgroundColor: "#95a5a6", // Greyed out when voting is disabled
@@ -297,6 +309,12 @@ const styles = StyleSheet.create({
   commentUsername: {
     fontWeight: "600",
     marginBottom: 2,
+  },
+  commentHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 8,
   },
   
 });

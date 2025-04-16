@@ -66,7 +66,7 @@ export default function CreatePoll() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Create a Poll</Text>
+      <Text style={styles.title}>Create Poll</Text>
       
       <TextInput
         style={styles.input}
@@ -78,7 +78,7 @@ export default function CreatePoll() {
         data={options}
         keyExtractor={(_, index) => index.toString()}
         renderItem={({ item, index }) => (
-          <View style={styles.optionContainer}>
+          <View>
             <TextInput
               style={styles.input}
               value={options[index]} // Keeps the value static
@@ -87,15 +87,19 @@ export default function CreatePoll() {
             />
             {options.length > 1 && (
               <TouchableOpacity onPress={() => removeOption(index)} style={styles.removeButton}>
-                <Text style={styles.removeText}>✖</Text>
+                <Text style={styles.removeText}>REMOVE</Text>
               </TouchableOpacity>
             )}
           </View>
         )}
       />
 
-      <Button title="Add Option" onPress={addOption}/>
-      <Button title="Create Poll" onPress={submitPoll}/>
+      <TouchableOpacity style={styles.addOptions} onPress={addOption}>
+        <Text style={styles.AddOptionsText}>ADD OPTION</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.createPoll} onPress={submitPoll}>
+        <Text style={styles.createPollText}>CREATE POLL</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -104,7 +108,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#fff",
+    backgroundColor: "white",
   },
   title: {
     fontSize: 24,
@@ -121,16 +125,44 @@ const styles = StyleSheet.create({
     fontSize: 16,
     backgroundColor: "#f0f0f0",
   },
-  optionContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
   removeButton: {
-    marginLeft: 10,
-    padding: 5,
+    backgroundColor: 'white',
+    borderWidth: 2,
+    borderColor: 'red',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 8,
   },
   removeText: {
-    fontSize: 18,
-    color: "red",
+    color: 'red',
+    fontWeight: 'bold',
+  },
+  addOptions: {
+    backgroundColor: 'white',
+    borderWidth: 2,
+    borderColor: 'green',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  AddOptionsText: {
+    color: 'green',
+    fontWeight: 'bold',
+  },
+  
+  createPoll: {
+    backgroundColor: 'blue',
+    paddingVertical: 8,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  createPollText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });

@@ -3,7 +3,8 @@ import { db, auth } from "@/lib/firebaseConfig";
 
 //Fetch Polls
 export const fetchPolls = async () => {
-  const querySnapshot = await getDocs(collection(db, "polls"));
+  const q = query(collection(db, "polls"), orderBy("createdAt", "desc"));
+  const querySnapshot = await getDocs(q);
   return querySnapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}));
 };
 

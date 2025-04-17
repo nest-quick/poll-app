@@ -7,57 +7,49 @@ import { useFocusEffect } from "@react-navigation/native"
 import { useLocalSearchParams } from "expo-router";
 import ProfileDetails from "@/components/ProfileDetails";
 
-export default function UserProfile() {
-  const { username } = useLocalSearchParams();
+export default function MyProfile() {
+  const { user } = useAuth();
   const [profileData, setProfileData] = useState<{username: string; bio: string; profilePicture: string; uid: string;} | null>(null);
   const [loading, setLoading] = useState(true);
   const[userPolls, setUserPolls] = useState<any[]>([]);
 
   const fetchProfileData = async() => {
-    if(!username) return;
+    if(!user?.uid) return;
 
-    try{
-      const q = query(collection(db, "users"), where ("username", "==", username));
-      const querySnapshot = await getDocs(q);
-
-      if(querySnapshot.empty){
-        console.warn("No user profile data found");
-        setProfileData(null);
-        return;
+    try {
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+  
+        if (!userSnap.exists()) {
+          setProfileData(null);
+          return;
+        }
+  
+        const data = userSnap.data();
+  
+        setProfileData({
+          username: data.username || "",
+          bio: data.bio || "",
+          profilePicture: data.profilePicture || "",
+          uid: user.uid,
+        });
+  
+        const pollsQuery = query(collection(db, "polls"), where("creatorId", "==", user.uid));
+        const pollSnapshot = await getDocs(pollsQuery);
+        const polls = pollSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  
+        setUserPolls(polls);
+      } catch (err) {
+        console.error("Error fetching user profile:", err);
+      } finally {
+        setLoading(false);
       }
-
-      const docSnap = querySnapshot.docs[0];
-      const data = docSnap.data();
-
-      setProfileData({
-        username: data.username || "",
-        bio: data.bio || "",
-        profilePicture: data.profilePicture || "",
-        uid: docSnap.id,
-      });
-
-      const pollsQuery = query(collection(db, "polls"), where("creatorId", "==", docSnap.id));
-      const pollSnapshot = await getDocs(pollsQuery);
-      const polls: any[] = [];
-
-      pollSnapshot.forEach((pollDoc) => {
-        polls.push({id: pollDoc.id, ...pollDoc.data()});
-      });
-
-      setUserPolls(polls);
-    }catch(error) {
-      console.error("Error fetching user profile: ", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useFocusEffect(
-    useCallback(() => {
+    };
+  
+    useFocusEffect(useCallback(() => {
       setLoading(true);
       fetchProfileData();
-    }, [username])
-  );
+    }, [user?.uid]));
 
   if(loading){
     return(
@@ -80,7 +72,7 @@ export default function UserProfile() {
       profileData={profileData}
       userPolls={userPolls}
       loading={loading}
-      showSignOut={false}
+      showSignOut={true}
     />
   );
 }

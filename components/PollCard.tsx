@@ -127,16 +127,36 @@ export default function PollCard({ id, question, options = [], votes = {}, voter
   return (
     <View style={styles.card}>
       <View style={styles.creatorRow}>
-        {creatorProfilePicture ? (
-          <Image source={{ uri: creatorProfilePicture }} style={styles.avatar} />
-        ) : (
-          <View style={styles.avatarPlaceholder} />
-        )}
-        <Link href={`/profile/${creatorUsername}`} asChild>
-        <TouchableOpacity>
-        <Text style={styles.username}>@{creatorUsername}</Text>
-        </TouchableOpacity>
+      {userId === creatorId ? (
+        <Link href="/profile/user" asChild>
+          <TouchableOpacity style={styles.creatorRow}>
+            {creatorProfilePicture ? (
+              <Image source={{ uri: creatorProfilePicture }} style={styles.avatar} />
+            ) : (
+              <View style={styles.avatarPlaceholder} />
+            )}
+            <Text style={styles.username}>@{creatorUsername}</Text>
+          </TouchableOpacity>
         </Link>
+      ) : (
+        <Link
+          href={{
+            pathname: "/profile/[username]",
+            params: { username: creatorUsername },
+          }}
+          asChild
+        >
+          <TouchableOpacity style={styles.creatorRow}>
+            {creatorProfilePicture ? (
+              <Image source={{ uri: creatorProfilePicture }} style={styles.avatar} />
+            ) : (
+              <View style={styles.avatarPlaceholder} />
+            )}
+            <Text style={styles.username}>@{creatorUsername}</Text>
+          </TouchableOpacity>
+        </Link>
+      )}
+
       </View>
 
       <Text style={styles.question}>{question}</Text>

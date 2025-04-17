@@ -69,8 +69,9 @@ export default function CreatePoll() {
       <Text style={styles.title}>Create Poll</Text>
       
       <TextInput
-        style={styles.input}
+        style={styles.inputQuestion}
         placeholder="Enter your poll question"
+        placeholderTextColor="blue"
         value={question}
         onChangeText={setQuestion}
       />
@@ -80,10 +81,11 @@ export default function CreatePoll() {
         renderItem={({ item, index }) => (
           <View>
             <TextInput
-              style={styles.input}
+              style={styles.optionsInput}
               value={options[index]} // Keeps the value static
               onChangeText={(text) => updateOption(text, index)}
               placeholder={`Option ${index + 1}`}
+              placeholderTextColor="green"
             />
             {options.length > 1 && (
               <TouchableOpacity onPress={() => removeOption(index)} style={styles.removeButton}>
@@ -118,13 +120,35 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "black",
     borderRadius: 8,
     padding: 10,
     marginBottom: 10,
     fontSize: 16,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "white",
+    color: "blue",
   },
+  inputQuestion: {
+    borderWidth: 1,
+    borderColor: "blue",
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 10,
+    fontSize: 16,
+    backgroundColor: "white",
+    color: "blue",
+  },
+  optionsInput: {
+    borderWidth: 1,
+    borderColor: "green",
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 10,
+    fontSize: 16,
+    backgroundColor: "white",
+    color: "green",
+  },
+
   removeButton: {
     backgroundColor: 'white',
     borderWidth: 2,

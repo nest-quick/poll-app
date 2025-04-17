@@ -188,6 +188,8 @@ export default function PollCard({ id, question, options = [], votes = {}, voter
               onChangeText={setCommentInput}
               placeholder="Write a comment...."
               style={styles.input}
+              placeholderTextColor="blue"
+              
             />
             <TouchableOpacity onPress={handleAddComment} style={styles.commentButton}>
               <Text style={styles.commentButtonText}>Post</Text>
@@ -202,7 +204,7 @@ export default function PollCard({ id, question, options = [], votes = {}, voter
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#f8f8f8",
+    backgroundColor: "white",
     padding: 15,
     borderRadius: 10,
     marginVertical: 10,
@@ -222,17 +224,17 @@ const styles = StyleSheet.create({
     color: "white",
   },
   disabledButton: {
-    backgroundColor: "#95a5a6", // Greyed out when voting is disabled
+    backgroundColor: "#95a5a6",
   },
   optionButton: {
     padding: 10,
-    backgroundColor: "#3498db",
+    backgroundColor: "green",
     borderRadius: 5,
     marginVertical: 5,
     alignItems: "center",
   },
   votedButton: {
-    backgroundColor: "red", // Highlight the voted option
+    backgroundColor: "red",
   },
   creatorRow: {
     flexDirection: "row",
@@ -258,8 +260,6 @@ const styles = StyleSheet.create({
   },
   commentSection: {
     marginTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: "#ccc",
     paddingTop: 8,
   },
   sectionTitle: {
@@ -272,14 +272,15 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "blue",
     padding: 8,
     borderRadius: 6,
     marginTop: 8,
     marginBottom: 4,
+    color: "blue",
   },
   commentButton: {
-    backgroundColor: "#007AFF",
+    backgroundColor: "blue",
     padding: 8,
     borderRadius: 6,
     alignItems: "center",

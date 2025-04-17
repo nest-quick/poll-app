@@ -29,6 +29,7 @@ export default function Login() {
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
+        placeholderTextColor="black"
       />
       <TextInput
         style={styles.input}
@@ -36,6 +37,7 @@ export default function Login() {
         secureTextEntry
         value={password}
         onChangeText={setPassword}
+        placeholderTextColor="black"
       />
       
       {error && <Text style={styles.errorText}>{error}</Text>}
@@ -69,7 +71,7 @@ const styles = StyleSheet.create({
   input: {
     width: "100%",
     height: 50,
-    borderColor: "#ccc",
+    borderColor: "black",
     borderWidth: 1,
     borderRadius: 5,
     paddingLeft: 10,
@@ -82,7 +84,7 @@ const styles = StyleSheet.create({
   },
   button: {
     width: "100%",
-    backgroundColor: "#007BFF",
+    backgroundColor: "blue",
     padding: 15,
     borderRadius: 5,
     alignItems: "center",
@@ -98,7 +100,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   registerLink: {
-    color: "#007BFF",
+    color: "green",
     marginLeft: 5,
     fontWeight: "bold",
   },

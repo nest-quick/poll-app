@@ -46,6 +46,7 @@ export default function Register() {
         placeholder="Username"
         value={username}
         onChangeText={setUsername}
+        placeholderTextColor="black"
       />
 
       <TextInput
@@ -54,6 +55,7 @@ export default function Register() {
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
+        placeholderTextColor="black"
       />
       <TextInput
         style={styles.input}
@@ -61,6 +63,7 @@ export default function Register() {
         secureTextEntry
         value={password}
         onChangeText={setPassword}
+        placeholderTextColor="black"
       />
       <TextInput
         style={styles.input}
@@ -68,6 +71,7 @@ export default function Register() {
         secureTextEntry
         value={confirmPassword}
         onChangeText={setConfirmPassword}
+        placeholderTextColor="black"
       />
       
       {error && <Text style={styles.errorText}>{error}</Text>}
@@ -101,12 +105,13 @@ const styles = StyleSheet.create({
   input: {
     width: "100%",
     height: 50,
-    borderColor: "#ccc",
+    borderColor: "black",
     borderWidth: 1,
     borderRadius: 5,
     paddingLeft: 10,
     marginBottom: 20,
     fontSize: 16,
+    color: "black",
   },
   errorText: {
     color: "red",
@@ -114,14 +119,14 @@ const styles = StyleSheet.create({
   },
   button: {
     width: "100%",
-    backgroundColor: "#007BFF",
+    backgroundColor: "blue",
     padding: 15,
     borderRadius: 5,
     alignItems: "center",
     marginBottom: 20,
   },
   buttonText: {
-    color: "#fff",
+    color: "white",
     fontSize: 18,
     fontWeight: "bold",
   },
@@ -130,7 +135,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   loginLink: {
-    color: "#007BFF",
+    color: "green",
     marginLeft: 5,
     fontWeight: "bold",
   },

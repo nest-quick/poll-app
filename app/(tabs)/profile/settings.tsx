@@ -76,7 +76,8 @@ export default function Settings(){
     
     return(
         <View style={styles.container}>
-            <Text style={styles.label}>Profile Picture</Text>
+            <Text style={styles.header}>Settings</Text>
+
             {imageBase64 ? (
                 <Image source={{ uri: imageBase64 }} style={styles.profileImage} />
             ) : (
@@ -84,7 +85,7 @@ export default function Settings(){
             )}
             <Button title="Choose Image" onPress={pickImage} />
 
-            <Text style={styles.label}>Bio</Text>
+            <Text style={styles.label}>EDIT BIO</Text>
             <TextInput
                 style={styles.input}
                 value={bio}
@@ -106,11 +107,13 @@ const styles = StyleSheet.create({
     centered: {
       flex: 1,
       justifyContent: "center",
+      alignItems: "center",
     },
     label: {
       marginTop: 15,
       fontSize: 16,
       fontWeight: "600",
+      alignSelf: "center",
     },
     input: {
       borderColor: "#ccc",
@@ -126,6 +129,7 @@ const styles = StyleSheet.create({
       borderRadius: 60,
       marginTop: 10,
       marginBottom: 10,
+      alignSelf: "center",
     },
     placeholderImage: {
       width: 120,
@@ -134,5 +138,12 @@ const styles = StyleSheet.create({
       backgroundColor: "#eee",
       marginTop: 10,
       marginBottom: 10,
+      alignSelf: "center",
+    },
+    header: {
+        fontSize: 26,
+        fontWeight: "700",
+        marginBottom: 20,
+        textAlign: "center",
     },
   });

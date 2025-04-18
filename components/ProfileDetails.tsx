@@ -55,7 +55,7 @@ export default function ProfileDetails({
       )}
 
       <View style={styles.pollSection}>
-        <Text style={styles.sectionTitle}>Your Polls</Text>
+        <Text style={styles.sectionTitle}>Polls</Text>
         {userPolls.length === 0 ? (
           <Text>No polls created yet.</Text>
         ) : (

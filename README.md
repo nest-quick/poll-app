@@ -1,50 +1,35 @@
-# Welcome to your Expo app 👋
+A full-stack real-time mobile polling app that allows users to create, vote on, and interact with polls instantly. Built with a strong focus on real-time data flow, user experience, and mobile accessibility.
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Features
+- User Authentication
 
-## Get started
+- Email/Password login
 
-1. Install dependencies
+- Google Sign-In (Firebase Authentication)
 
-   ```bash
-   npm install
-   ```
+Real-Time Polling
 
-2. Start the app
+- Polls update instantly using Firebase Firestore
 
-   ```bash
-    npx expo start
-   ```
+- Live vote counts and poll status
 
-In the output, you'll find options to open the app in a
+Interactive Poll Feed
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- Users can browse, vote, and view poll outcomes dynamically
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- Built-in countdown timers for each poll
 
-## Get a fresh project
+Mobile-Optimized UI/UX
 
-When you're ready, run:
+- Smooth, native-like user experience
 
-```bash
-npm run reset-project
-```
+- Developed with Expo and React Native
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Tech Stack
+   Frontend: React Native (Expo)
 
-## Learn more
+   Backend/Database: Firebase Firestore
 
-To learn more about developing your project with Expo, look at the following resources:
+   Authentication: Firebase Auth (Email/Password + Google Sign-In)
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+   Hosting & Deployment: Expo
